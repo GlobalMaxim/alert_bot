@@ -31,7 +31,9 @@ async def register_user(message: Message):
 # @dp.message_handler(Text(equals=["Показать карту воздушных тревог"]))
 @dp.message_handler(Text(equals=["Отримати карту повітряних тривог"]))
 async def run(message: Message):
-    
+    if str(message.from_user.id) != admin_id:
+        await bot.send_message(admin_id, text=f'{message.from_user.id}')
+        await bot.send_message(admin_id, text=f"Пользователь с ником @{message.from_user.username},{message.from_user.first_name}, id={message.from_user.id} воспользовался ботом")
     await message.answer('Зачекайте...')
     regions = api_parse_info()
     await message.answer('Тривоги працюють в наступних областях:')
