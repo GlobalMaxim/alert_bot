@@ -39,7 +39,7 @@ async def run(message: Message):
         await message.answer(f"<b>{key}</b>\nПочаток тривоги у {value}", parse_mode=ParseMode.HTML)
     await message.answer('Зачекайте, фото загружається...')
     parse_photo()
-    await message.answer_photo(photo=open('screenshot.png', 'rb'))
+    await message.answer_photo(photo=open('screenshot.png', 'rb'), reply_markup=menu)
 
 @dp.message_handler(CommandHelp())
 async def bot_help(message: Message):
