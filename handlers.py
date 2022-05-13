@@ -6,8 +6,8 @@ from aiogram.types import Message, BotCommand
 from aiogram.dispatcher.filters import Command, Text
 from keyboards.default.menu import menu
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
-
-from test import parse_photo, api_parse_info
+from redisPreparation import Redis_Preparation
+from test import  parse_photo, api_parse_info
 
 async def send_to_admin(dp):
     await bot.send_message(admin_id, 'Бот запущен', reply_markup=menu)
@@ -19,8 +19,8 @@ async def send_to_admin(dp):
 @dp.message_handler(CommandStart())
 async def register_user(message: Message):
     chat_id = message.from_user.id
-    name = message.from_user.username
-    await bot.send_message(chat_id=chat_id, text=f'Привет, {name}', reply_markup=menu)
+    name = message.from_user.first_name
+    await bot.send_message(chat_id=chat_id, text=f'Привіт, {name}', reply_markup=menu)
 
 # @dp.message_handler(Text(equals=["/restart"]))
 # async def register_user(message: Message):
@@ -32,15 +32,18 @@ async def register_user(message: Message):
 @dp.message_handler(Text(equals=["Отримати карту повітряних тривог"]))
 async def run(message: Message):
     if str(message.from_user.id) != admin_id:
-        await bot.send_message(admin_id, text=f'{message.from_user.id}')
-        await bot.send_message(admin_id, text=f"Пользователь с ником @{message.from_user.username},{message.from_user.first_name}, id={message.from_user.id} воспользовался ботом")
+        # await bot.send_message(admin_id, text=f'{message.from_user.id}')
+        notify_admin=f"Пользователь с ником @{message.from_user.username}, {message.from_user.first_name} воспользовался ботом"
+        await bot.send_message(admin_id, text=notify_admin, disable_notification=True)
     await message.answer('Зачекайте...')
-    regions = api_parse_info()
+    exec_redis = Redis_Preparation()
+    res = exec_redis.get_data_from_redis(api_parse_info())
     await message.answer('Тривоги працюють в наступних областях:')
-    for key,value in regions.items():
+    for key,value in res['regions'].items():
         await message.answer(f"<b>{key}</b>\nПочаток тривоги у {value}", parse_mode=ParseMode.HTML)
-    await message.answer('Зачекайте, фото загружається...')
-    parse_photo()
+    await message.answer('Зачекайте, завантажується фото...')
+    if res['is_updated'] == True:
+        parse_photo()
     await message.answer_photo(photo=open('screenshot.png', 'rb'), reply_markup=menu)
 
 @dp.message_handler(CommandHelp())
