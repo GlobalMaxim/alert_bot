@@ -1,4 +1,3 @@
-from matplotlib.style import use
 import mysql.connector
 from mysql.connector import Error
 # from create_table import create_table_query
@@ -12,7 +11,7 @@ def connect():
         return connection
     except Error as er:
         with open('database_log.txt') as f:
-            f.write(er)
+            f.write(str(er))
 
 def get_user(user_id):
     query = 'SELECT user_id, username, first_name, last_name, language_code, count_exec_script FROM users WHERE user_id=%s'
@@ -21,6 +20,8 @@ def get_user(user_id):
     cursor = connection.cursor()
     cursor.execute(query, atr)
     user_data = cursor.fetchall()
+    cursor.close()
+    connection.close()
     return(user_data)
 
 
@@ -39,14 +40,17 @@ def add_new_user(message):
         cursor = connection.cursor()
         cursor.execute(query, apt)
         connection.commit()
-        return
-
-    query = 'INSERT INTO users (user_id, first_name, last_name, username, language_code, count_exec_script) VALUES (%s, %s, %s, %s, %s, 1)'
-    atr = (user_id,first_name, last_name, username, language_code)
-    connection = connect()
-    cursor = connection.cursor()
-    cursor.execute(query, atr)
-    connection.commit()
+        cursor.close()
+        connection.close()
+    else:
+        query = 'INSERT INTO users (user_id, first_name, last_name, username, language_code, count_exec_script) VALUES (%s, %s, %s, %s, %s, 1)'
+        atr = (user_id,first_name, last_name, username, language_code)
+        connection = connect()
+        cursor = connection.cursor()
+        cursor.execute(query, atr)
+        connection.commit()
+        cursor.close()
+        connection.close()
 
 def count_users():
     query = 'SELECT COUNT(DISTINCT user_id) from users'
@@ -54,6 +58,8 @@ def count_users():
     cursor = connection.cursor()
     cursor.execute(query)
     users_count = cursor.fetchall()
+    cursor.close()
+    connection.close()
     return(users_count[0][0])
 
 def count_requests():
@@ -62,6 +68,8 @@ def count_requests():
     cursor = connection.cursor()
     cursor.execute(query)
     count_requests = cursor.fetchall()
+    cursor.close()
+    connection.close()
     return(count_requests[0][0])
 
 # count_requests()

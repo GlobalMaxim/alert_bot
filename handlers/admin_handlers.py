@@ -1,3 +1,4 @@
+import imp
 from telebot import dp, bot
 from aiogram.types import Message, BotCommand, BotCommandScopeChat, BotCommandScopeDefault
 from config import admin_id
@@ -6,6 +7,8 @@ from aiogram.dispatcher.filters import Command, Text
 from db.database import count_users, count_requests
 
 async def send_to_admin(dp):
+    import middlewares
+    middlewares.setup(dp)
     await bot.send_message(admin_id, 'Бот запущен', reply_markup=menu)
     await bot.set_my_commands([
         BotCommand(command='/restart', description='Перезапустить')
