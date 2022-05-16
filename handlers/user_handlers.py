@@ -8,7 +8,7 @@ from keyboards.default.menu import menu
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from redisPreparation import Redis_Preparation
 from db.database import add_new_user
-from test import  parse_photo, api_parse_info
+from test_windows import  parse_photo, api_parse_info
 from utils.misc.throttling import rate_limit
 
 # async def send_to_admin(dp):
