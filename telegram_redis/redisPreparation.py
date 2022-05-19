@@ -86,11 +86,16 @@ class Redis_Preparation():
         
     def get_new_users_from_redis(self):
         redis_client = redis.Redis(db=1)
-        return json.loads(redis_client.get('users'))
+        if (redis_client.get('users')) != None:
+            users = json.loads(redis_client.get('users'))
+            # print(users)
+            return users
     
     def get_new_updates_from_redis(self):
         redis_client = redis.Redis(db=1)
-        return json.loads(redis_client.get('updates'))
+        if (redis_client.get('updates')) != None:
+            users = json.loads(redis_client.get('updates'))
+            return users
 
 
     def set_temp_data_to_redis(self, message):

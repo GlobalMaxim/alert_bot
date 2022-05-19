@@ -93,36 +93,45 @@ def count_requests():
             connection.close()
 
 def add_new_users_from_redis_to_db():
-    try:
+    # try:
         r = Redis_Preparation()
         users = r.get_new_users_from_redis()
-        users_arr = []
-        for key, values in users.items():
-            users_arr.append((values['user_id'], values['first_name'], values['last_name'], values['username'], values['language_code'], values['count_exec_script'], values['created_at'], values['modified_at']))
-        connection = connect()
-        cursor = connection.cursor()
-        query = 'INSERT IGNORE INTO users (user_id, first_name, last_name, username, language_code, count_exec_script, created_at, modified_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
-        cursor.executemany(query, users_arr)
-        connection.commit()
-    except Exception as ex :
-            print(str(ex))
-            logging.exception('\n'+'Add New Users Exception!!! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
-    finally:
-        cursor.close()
-        connection.close()
+
+        # print(users)
+        if users != None:
+            users_arr = []
+            for key, values in users.items():
+                users_arr.append((values['user_id'], values['first_name'], values['last_name'], values['username'], values['language_code'], values['count_exec_script'], values['created_at'], values['modified_at']))
+            connection = connect()
+            cursor = connection.cursor()
+            query = 'INSERT IGNORE INTO users (user_id, first_name, last_name, username, language_code, count_exec_script, created_at, modified_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
+            cursor.executemany(query, users_arr)
+            connection.commit()
+            # return users_arr
+        # print('adding executed')
+        # return
+    # except Exception as ex :
+    #         print('New users exception')
+    #         print(str(ex))
+    #         logging.exception('\n'+'Add New Users Exception!!! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
+    # finally:
+    #     cursor.close()
+    #     connection.close()
 
 def add_user_updates_from_redis_to_db():
     try:
         r = Redis_Preparation()
         users = r.get_new_updates_from_redis()
-        users_arr = []
-        for key, values in users.items():
-            users_arr.append((values['count_exec_script'], values['modified_at'],values['user_id']))
-        connection = connect()
-        cursor = connection.cursor()
-        query = 'UPDATE users set count_exec_script = count_exec_script + %s, modified_at = %s where user_id = %s'
-        cursor.executemany(query, users_arr)
-        connection.commit()
+        if users is not None:
+            users_arr = []
+            for key, values in users.items():
+                users_arr.append((values['count_exec_script'], values['modified_at'],values['user_id']))
+            connection = connect()
+            cursor = connection.cursor()
+            query = 'UPDATE users set count_exec_script = count_exec_script + %s, modified_at = %s where user_id = %s'
+            cursor.executemany(query, users_arr)
+            connection.commit()
+            # return users_arr
     except Exception as ex :
             print(str(ex))
             logging.exception('\n'+'Add New Users Exception!!! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
