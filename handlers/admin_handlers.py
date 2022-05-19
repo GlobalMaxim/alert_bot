@@ -15,9 +15,11 @@ async def send_to_admin(dp):
         BotCommand(command='/restart', description='Перезапустить')
     ], scope=BotCommandScopeDefault())
     await bot.set_my_commands([
-        BotCommand('show_users_count', 'Колличество пользователей'),
-        BotCommand('show_all_requests_count', 'Всего запросов'),
+        BotCommand('show_all_data', 'Показать статистику'),
         BotCommand('save', 'Сохранить данные'),
+        BotCommand('show_users_count', 'Колличество пользователей'),
+        BotCommand('show_all_requests_count', 'Всего запросов')
+        
         # BotCommand('append', 'ОБновить пользователей')
     ], scope=BotCommandScopeChat(chat_id=admin_id))
 
@@ -29,7 +31,18 @@ async def count_user(message: Message):
 @dp.message_handler(commands=['save'])
 async def reset(message: Message):
     save_data()
-    # r = Redis_Preparation()
+
+@dp.message_handler(commands=['show_all_data'])
+async def show_all_info(message: Message):
+    r = Redis_Preparation()
+    new_users =  r.get_count_new_users()
+    await message.answer(text=f'За сегодня {new_users} новых пользователей')
+    updated_users = r.get_count_user_updates()
+    await message.answer(text=f'За сегодня {updated_users} новых запросов')
+    count = count_users()
+    await message.answer(text=f'Всего {count} пользователей')
+    count = count_requests()
+    await message.answer(text=f'Всего {count} Запросов', reply_markup=menu)
     # r.create_new_user_to_redis(message)
     # r.get_new_users_from_redis()
 

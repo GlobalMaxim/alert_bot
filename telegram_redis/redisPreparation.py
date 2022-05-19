@@ -97,31 +97,23 @@ class Redis_Preparation():
             users = json.loads(redis_client.get('updates'))
             return users
 
-
-    def set_temp_data_to_redis(self, message):
-        try:
-            redis_client = redis.Redis(db=1)
-            user_id = message.from_user.id
-            username = message.from_user.username
-            first_name = message.from_user.first_name
-            last_name = message.from_user.last_name
-            language_code = message.from_user.language_code
-
-            user_from_redis = redis_client.get(str(user_id))
-
-            
-            if user_from_redis is None:
-                user_data = {'user_id':user_id, 'first_name': first_name, 'last_name': last_name, 'username': username, 'language_code': language_code, 'count_exec_scripts': 1, 'modified_at': str(datetime.now())}
-                redis_client.set(str(user_id), json.dumps(user_data))
-            else:
-                user_data_from_redis = json.loads(user_from_redis)
-                user_data_from_redis['count_exec_scripts'] += 1
-                user_data_from_redis['modified_at'] = str(datetime.now())
-                redis_client.set(str(user_id), json.dumps(user_data_from_redis))
-        except Exception as ex:
-            with open('log/redis-log.txt', 'a') as file:
-                file.write(str(ex))
+    def get_count_new_users(self):
+        users = self.get_new_users_from_redis()
+        if users is not None:
+            user_length = len(users)
+            return user_length
+        else:
+            return 0
     
+    def get_count_user_updates(self):
+        users = self.get_new_updates_from_redis()
+        if users is not None:
+            count = 0
+            for key, values in users.items():
+                count += int(values['count_exec_script'])
+            return count
+        else:
+            return 0
 
 # r = Redis_Preparation()
 # print(r.get_new_users_from_redis())
