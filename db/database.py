@@ -133,10 +133,10 @@ class Database():
         print('new users saved')
         self.add_user_updates_from_redis_to_db()
         print('added updates')
-        # r = redis.Redis(db=1)
-        # r.delete('updates')
-        # r.delete('users')
-        # print('Cache deleted')
+        r = redis.Redis(db=1)
+        r.delete('updates')
+        r.delete('users')
+        print('Cache deleted')
     
     def clear_redis(self):
         r = redis.Redis(db=1)

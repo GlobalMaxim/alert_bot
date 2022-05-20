@@ -11,11 +11,16 @@ from db.database import Database
 from test_windows import  parse_photo, api_parse_info
 from utils.misc.throttling import rate_limit
 
-@dp.message_handler(Text(equals=["/restart"]))
 @dp.message_handler(CommandStart())
 async def register_user(message: Message):
     r = Redis_Preparation()
     r.create_new_user_to_redis(message)
+    chat_id = message.from_user.id
+    name = message.from_user.first_name
+    await bot.send_message(chat_id=chat_id, text=f'Привіт, {name}', reply_markup=menu)
+
+@dp.message_handler(Text(equals=["/restart"]))
+async def register_user(message: Message):
     chat_id = message.from_user.id
     name = message.from_user.first_name
     await bot.send_message(chat_id=chat_id, text=f'Привіт, {name}', reply_markup=menu)

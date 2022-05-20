@@ -16,8 +16,8 @@ async def send_to_admin(dp):
     ], scope=BotCommandScopeDefault())
     await bot.set_my_commands([
         BotCommand('show_all_data', 'Показать статистику'),
-        BotCommand('save', 'Сохранить данные'),
-        BotCommand('delete', 'Очистить кеш')
+        BotCommand('save', 'Сохранить данные')
+        # BotCommand('delete', 'Очистить кеш')
         # BotCommand('show_users_count', 'Колличество пользователей'),
         # BotCommand('show_all_requests_count', 'Всего запросов')
         
