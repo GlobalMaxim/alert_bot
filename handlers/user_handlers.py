@@ -7,7 +7,7 @@ from aiogram.dispatcher.filters import Command, Text
 from keyboards.default.menu import menu
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from telegram_redis.redisPreparation import Redis_Preparation
-from db.database import add_new_user
+from db.database import Database
 from test_windows import  parse_photo, api_parse_info
 from utils.misc.throttling import rate_limit
 
@@ -59,7 +59,7 @@ async def register_user(message: Message):
 @dp.message_handler()
 async def register_user(message: Message):
     chat_id = message.from_user.id
-    name = message.from_user.username
+    name = message.from_user.first_name
     await bot.send_message(chat_id=chat_id, text=f'{name}, спробуйте ще раз', reply_markup=menu)
 
 

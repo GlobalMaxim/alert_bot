@@ -4,7 +4,7 @@ from aiogram.types import Message, BotCommand, BotCommandScopeChat, BotCommandSc
 from config import admin_id
 from keyboards.default.menu import menu
 from aiogram.dispatcher.filters import Command, Text
-from db.database import count_users, count_requests, save_data
+from db.database import Database
 from telegram_redis.redisPreparation import Redis_Preparation 
 
 async def send_to_admin(dp):
@@ -25,35 +25,43 @@ async def send_to_admin(dp):
 
 @dp.message_handler(commands=['show_users_count'])
 async def count_user(message: Message):
-    count = count_users()
+    db = Database()
+    count = db.count_users()
+    db.close_connection()
     await message.answer(text=f'Всего {count} пользователей', reply_markup=menu)
 
 @dp.message_handler(commands=['save'])
 async def reset(message: Message):
-    save_data()
+    db = Database()
+    db.save_data_to_db()
+    db.close_connection()
+    message.answer('Data saved to db')
+
+@dp.message_handler(commands=['delete'])
+async def reset(message: Message):
+    db = Database()
+    db.clear_redis()
+    db.close_connection()
+    message.answer('Redis cleared')
+
 
 @dp.message_handler(commands=['show_all_data'])
 async def show_all_info(message: Message):
     r = Redis_Preparation()
     new_users =  r.get_count_new_users()
+    db = Database()
     await message.answer(text=f'За сегодня {new_users} новых пользователей')
     updated_users = r.get_count_user_updates()
     await message.answer(text=f'За сегодня {updated_users} новых запросов')
-    count = count_users()
+    count = db.count_users()
     await message.answer(text=f'Всего {count} пользователей')
-    count = count_requests()
+    count = db.count_requests()
     await message.answer(text=f'Всего {count} Запросов', reply_markup=menu)
-    # r.create_new_user_to_redis(message)
-    # r.get_new_users_from_redis()
-
-# @dp.message_handler(commands=['append'])
-# async def reset(message: Message):
-    # r = Redis_Preparation()
-    # r.create_user_updates_to_redis(message)
-    # r.get_new_updates_from_redis()
-    # await message.answer(text=f'Всего {count} пользователей', reply_markup=menu)
+    db.close_connection()
 
 @dp.message_handler(commands=['show_all_requests_count'])
 async def count_user(message: Message):
-    count = count_requests()
+    db = Database()
+    count = db.count_requests()
     await message.answer(text=f'Всего {count} Запросов', reply_markup=menu)
+    db.close_connection()
