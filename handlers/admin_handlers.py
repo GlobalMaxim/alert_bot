@@ -17,8 +17,9 @@ async def send_to_admin(dp):
     await bot.set_my_commands([
         BotCommand('show_all_data', 'Показать статистику'),
         BotCommand('save', 'Сохранить данные'),
-        BotCommand('show_users_count', 'Колличество пользователей'),
-        BotCommand('show_all_requests_count', 'Всего запросов')
+        BotCommand('delete', 'Очистить кеш')
+        # BotCommand('show_users_count', 'Колличество пользователей'),
+        # BotCommand('show_all_requests_count', 'Всего запросов')
         
         # BotCommand('append', 'ОБновить пользователей')
     ], scope=BotCommandScopeChat(chat_id=admin_id))
@@ -28,21 +29,21 @@ async def count_user(message: Message):
     db = Database()
     count = db.count_users()
     db.close_connection()
-    await message.answer(text=f'Всего {count} пользователей', reply_markup=menu)
+    await message.answer(text=f'Всего {count} пользователей')
 
 @dp.message_handler(commands=['save'])
 async def reset(message: Message):
     db = Database()
     db.save_data_to_db()
     db.close_connection()
-    message.answer('Data saved to db')
+    await message.answer('Data saved to db')
 
 @dp.message_handler(commands=['delete'])
 async def reset(message: Message):
     db = Database()
     db.clear_redis()
     db.close_connection()
-    message.answer('Redis cleared')
+    await message.answer('Redis cleared')
 
 
 @dp.message_handler(commands=['show_all_data'])
@@ -63,5 +64,5 @@ async def show_all_info(message: Message):
 async def count_user(message: Message):
     db = Database()
     count = db.count_requests()
-    await message.answer(text=f'Всего {count} Запросов', reply_markup=menu)
+    await message.answer(text=f'Всего {count} Запросов')
     db.close_connection()

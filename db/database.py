@@ -98,11 +98,12 @@ class Database():
                 query = 'INSERT IGNORE INTO users (user_id, first_name, last_name, username, language_code, count_exec_script, created_at, modified_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
                 cursor.executemany(query, users_arr)
                 self.connection.commit()
+                cursor.close()
         except Exception as ex :
                 logging.exception('\n'+'Add New Users Exception!!! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
         finally:
             self.save_data_to_file(users, 'new_users')
-            cursor.close()
+            
 
     def add_user_updates_from_redis_to_db(self):
         try:
@@ -116,12 +117,13 @@ class Database():
                 query = 'UPDATE users set count_exec_script = count_exec_script + %s, modified_at = %s where user_id = %s'
                 cursor.executemany(query, users_arr)
                 self.connection.commit()
+                cursor.close()
         except Exception as ex :
                 print(str(ex))
                 logging.exception('\n'+'Add New Users Exception!!! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
         finally:
             self.save_data_to_file(users, 'user_updates')
-            cursor.close()
+            
     
     def close_connection(self):
         self.connection.close()
