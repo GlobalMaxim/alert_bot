@@ -1,3 +1,4 @@
+import asyncio
 import imp
 from telebot import dp, bot
 from aiogram.types import Message, BotCommand, BotCommandScopeChat, BotCommandScopeDefault
@@ -6,8 +7,11 @@ from keyboards.default.menu import menu
 from aiogram.dispatcher.filters import Command, Text
 from db.database import Database
 from telegram_redis.redisPreparation import Redis_Preparation 
+from crone.crone import scheduler
+
 
 async def send_to_admin(dp):
+    asyncio.create_task(scheduler(bot))
     import middlewares
     middlewares.setup(dp)
     await bot.send_message(admin_id, 'Бот запущен', reply_markup=menu)
