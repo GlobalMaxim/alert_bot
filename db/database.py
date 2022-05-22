@@ -137,15 +137,13 @@ class Database():
         self.connection.close()
 
     def save_data_to_db(self):
-        new_users = str(0)
-        updated_users = str(0)
-        # new_users =  self.add_new_users_from_redis_to_db()
+        new_users =  self.add_new_users_from_redis_to_db()
         print(f'Saved {new_users} new users')
-        # updated_users =  self.add_user_updates_from_redis_to_db()
+        updated_users =  self.add_user_updates_from_redis_to_db()
         print(f'Saved {updated_users} user updates')
-        # r = redis.Redis(db=1)
-        # r.delete('updates')
-        # r.delete('users')
+        r = redis.Redis(db=1)
+        r.delete('updates')
+        r.delete('users')
         print('Cache deleted')
         return [new_users, updated_users]
 
