@@ -7,6 +7,7 @@ import redis
 import time
 from datetime import datetime
 from selenium.webdriver.chrome.options import Options
+from config import API_KEY
 from parser import Parser
 from imagePreparator import ImagePreparator
 import json
@@ -58,7 +59,7 @@ def api_parse_info():
     
     regions = {}
     headers = {
-         "X-API-Key": "4083272368ae9c7a6912cf489ec087de8b162cfd"
+         "X-API-Key": API_KEY
     }
     url = 'https://alerts.com.ua/api/states'
     req = requests.get(url, headers=headers)

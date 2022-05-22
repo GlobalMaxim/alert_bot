@@ -1,15 +1,19 @@
 from aiogram.types import ParseMode
 from telebot import dp, bot
 from aiogram.types import Message
-from config import admin_id
-from aiogram.types import Message, BotCommand, BotCommandScopeChatAdministrators
-from aiogram.dispatcher.filters import Command, Text
+from config import admin_id, OS
+from aiogram.types import Message
+from aiogram.dispatcher.filters import Text
 from keyboards.default.menu import menu
 from aiogram.dispatcher.filters import CommandStart, CommandHelp
 from telegram_redis.redisPreparation import Redis_Preparation
-from db.database import Database
-from test_windows import  parse_photo, api_parse_info
+
 from utils.misc.throttling import rate_limit
+
+if OS == 'Windows':
+    from test_windows import  parse_photo, api_parse_info
+elif OS == 'Ubuntu':
+    from test_ubuntu import  parse_photo, api_parse_info
 
 @dp.message_handler(CommandStart())
 async def register_user(message: Message):
@@ -44,8 +48,6 @@ async def run(message: Message):
         parse_photo()
     await message.answer_photo(photo=open('screenshot.png', 'rb'), reply_markup=menu)
     r.create_user_updates_to_redis(message)
-    # exec_redis.set_temp_data_to_redis(message)
-    # add_new_user(message)
 
 @dp.message_handler(CommandHelp())
 async def bot_help(message: Message):

@@ -1,9 +1,7 @@
 from datetime import datetime
-from distutils.debug import DEBUG
-from genericpath import exists
 import json
 import mysql.connector
-from mysql.connector import Error
+from config import DATABASE_HOST, DATABASE_PASS
 import redis
 import logging
 import os
@@ -12,7 +10,7 @@ from telegram_redis.redisPreparation import Redis_Preparation
 
 class Database():
     def __init__(self):
-        self.connection = mysql.connector.connect(user='admin', password='Vfrcbv19981408', port='3306', host='alerttelegrambot.cfhtqnpm0xnk.us-east-2.rds.amazonaws.com', database="alert_telegram_bot")
+        self.connection = mysql.connector.connect(user='admin', password=DATABASE_PASS, port='3306', host=DATABASE_HOST, database="alert_telegram_bot")
         logging.basicConfig(filename='log/database-log.txt', level=logging.DEBUG)
 
     def get_user(self, user_id):

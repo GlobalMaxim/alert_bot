@@ -1,13 +1,17 @@
 import asyncio
-import imp
 from telebot import dp, bot
 from aiogram.types import Message, BotCommand, BotCommandScopeChat, BotCommandScopeDefault
-from config import admin_id
+from config import admin_id, OS
 from keyboards.default.menu import menu
 from aiogram.dispatcher.filters import Command, Text
 from db.database import Database
 from telegram_redis.redisPreparation import Redis_Preparation 
 from crone.crone import scheduler
+
+if OS == 'Windows':
+    from test_windows import  parse_photo, api_parse_info
+elif OS == 'Ubuntu':
+    from test_ubuntu import  parse_photo, api_parse_info
 
 
 async def send_to_admin(dp):
@@ -20,6 +24,7 @@ async def send_to_admin(dp):
     ], scope=BotCommandScopeDefault())
     await bot.set_my_commands([
         BotCommand('show_all_data', 'Показать статистику'),
+        BotCommand('parse', 'Обновить фото'),
         BotCommand('save', 'Сохранить данные')
         # BotCommand('delete', 'Очистить кеш')
         # BotCommand('show_users_count', 'Колличество пользователей'),

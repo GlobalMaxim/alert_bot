@@ -1,12 +1,10 @@
-import asyncio
-from re import A
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 import requests
-import time
 from datetime import datetime
 from selenium.webdriver.chrome.options import Options
+from config import API_KEY
 from parser import Parser
 from imagePreparator import ImagePreparator
 import json
@@ -43,8 +41,7 @@ def parse_info():
     options.add_argument("--headless")
     options.add_argument('--disable-gpu')
     options.add_argument("window-size=1920,1080")
-    options.add_experimental_option('excludeSwitches', ['enable-automation'])
-    
+    # options.add_experimental_option('excludeSwitches', ['enable-automation'])
     webd = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
     wd1 = Parser(webd)
     wd1.openPage('https://alarmmap.online/')
@@ -58,7 +55,7 @@ def api_parse_info():
     try:
         regions = {}
         headers = {
-            "X-API-Key": "4083272368ae9c7a6912cf489ec087de8b162cfd"
+            "X-API-Key": API_KEY
         }
         url = 'https://alerts.com.ua/api/states'
         req = requests.get(url, headers=headers)
