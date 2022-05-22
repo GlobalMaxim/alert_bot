@@ -98,7 +98,11 @@ class Database():
                 query = 'INSERT IGNORE INTO users (user_id, first_name, last_name, username, language_code, count_exec_script, created_at, modified_at) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)'
                 cursor.executemany(query, users_arr)
                 self.connection.commit()
+                count = cursor.rowcount
                 cursor.close()
+                return str(count)
+            else:
+                return str(0)
         except Exception as ex :
                 logging.exception('\n'+'Add New Users Exception!!! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
         finally:
@@ -117,7 +121,11 @@ class Database():
                 query = 'UPDATE users set count_exec_script = count_exec_script + %s, modified_at = %s where user_id = %s'
                 cursor.executemany(query, users_arr)
                 self.connection.commit()
+                count = cursor.rowcount
                 cursor.close()
+                return str(count)
+            else:
+                return str(0)
         except Exception as ex :
                 print(str(ex))
                 logging.exception('\n'+'Add New Users Exception!!! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
@@ -129,14 +137,18 @@ class Database():
         self.connection.close()
 
     def save_data_to_db(self):
-        self.add_new_users_from_redis_to_db()
-        print('new users saved')
-        self.add_user_updates_from_redis_to_db()
-        print('added updates')
-        r = redis.Redis(db=1)
-        r.delete('updates')
-        r.delete('users')
+        new_users = str(0)
+        updated_users = str(0)
+        # new_users =  self.add_new_users_from_redis_to_db()
+        print(f'Saved {new_users} new users')
+        # updated_users =  self.add_user_updates_from_redis_to_db()
+        print(f'Saved {updated_users} user updates')
+        # r = redis.Redis(db=1)
+        # r.delete('updates')
+        # r.delete('users')
         print('Cache deleted')
+        return [new_users, updated_users]
+
     
     def clear_redis(self):
         r = redis.Redis(db=1)

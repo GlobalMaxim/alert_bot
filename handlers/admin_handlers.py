@@ -36,11 +36,11 @@ async def count_user(message: Message):
     await message.answer(text=f'Всего {count} пользователей')
 
 @dp.message_handler(commands=['save'])
-async def reset(message: Message):
+async def save(message: Message):
     db = Database()
-    db.save_data_to_db()
+    values = db.save_data_to_db()
     db.close_connection()
-    await message.answer('Data saved to db')
+    await message.answer(f'Добавлено {values[0]} новых пользоватеелей и обновлено {values[1]} пользователя')
 
 @dp.message_handler(commands=['delete'])
 async def reset(message: Message):
