@@ -47,6 +47,14 @@ async def save(message: Message):
     db.close_connection()
     await message.answer(f'Добавлено {values[0]} новых пользоватеелей и обновлено {values[1]} пользователя')
 
+@dp.message_handler(commands=['parse'])
+async def save(message: Message):
+    parse_photo()
+    # db = Database()
+    # values = db.save_data_to_db()
+    # db.close_connection()
+    await message.answer('Фото обновлено')
+
 @dp.message_handler(commands=['delete'])
 async def reset(message: Message):
     db = Database()
