@@ -38,15 +38,16 @@ async def run(message: Message):
         await bot.send_message(admin_id, text=notify_admin, disable_notification=True)
     await message.answer('Зачекайте...')
     r = Redis_Preparation()
-    api_data = api_parse_info()
-    res = r.get_regions_from_redis(api_data)
-    await message.answer('Тривоги працюють в наступних областях:')
-    for key,value in res['regions'].items():
-        await message.answer(f"<b>{key}</b>\nПочаток тривоги у {value}", parse_mode=ParseMode.HTML)
-    await message.answer('Зачекайте, завантажується фото...')
-    if res['is_updated'] == True:
-        parse_photo()
-    await message.answer_photo(photo=open('screenshot.png', 'rb'), reply_markup=menu)
+    # api_data = api_parse_info()
+    res = r.get_regions_from_redis()
+    if len(res) > 0:
+        await message.answer('Тривоги працюють в наступних областях:')
+        for key,value in res['regions'].items():
+            await message.answer(f"<b>{key}</b>\nПочаток тривоги у {value}", parse_mode=ParseMode.HTML)
+        await message.answer('Зачекайте, завантажується фото...')
+        await message.answer_photo(photo=open('screenshot.png', 'rb'))
+    else:
+        await message.answer('Тривог зараз немає!')
     r.create_user_updates_to_redis(message)
 
 @dp.message_handler(CommandHelp())

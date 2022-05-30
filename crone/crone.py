@@ -1,7 +1,14 @@
 import aioschedule
 import asyncio
-from config import admin_id
+from config import OS, admin_id
 from db.database import Database
+from telegram_redis.redisPreparation import Redis_Preparation
+
+
+if OS == 'Windows':
+    from test_windows import  parse_photo, api_parse_info
+elif OS == 'Ubuntu':
+    from test_ubuntu import  parse_photo, api_parse_info
 
 values = []
 
@@ -10,12 +17,20 @@ async def execute_script():
     db = Database()
     values = db.save_data_to_db()
 
+async def update_api_data():
+    api_data = api_parse_info()
+    r = Redis_Preparation()
+    res = r.get_and_update_regions_from_redis(api_data)
+    if res['is_updated'] == True:
+        parse_photo()
+
 async def send_message_to_admin(bot):
     await bot.send_message(admin_id, f'Сохранено {values[0]} новых пользователей и обновлено {values[1]} старых пользователя')
 
 async def scheduler(bot):
     aioschedule.every().day.at('01:59').do(execute_script)
     aioschedule.every().day.at('02:00').do(send_message_to_admin, bot=bot)
+    aioschedule.every().minute.do(update_api_data)
     
     
     while True:
