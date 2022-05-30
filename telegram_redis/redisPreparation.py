@@ -31,9 +31,10 @@ class Redis_Preparation():
         try:
             with redis.Redis() as redis_client:
                 result = {}
-                result['regions'] = json.loads(redis_client.get('reg'))
+                data = json.loads(redis_client.get('reg'))
+                if len(data) > 0:
+                    result['regions'] = data
                 return result
-
         except Exception as ex:
 
             logging.exception('\n'+'Get regions from redis error! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
