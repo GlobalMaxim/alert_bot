@@ -18,14 +18,15 @@ async def parse_photo():
         options = Options()
         if OS == 'Windows':
             options.add_argument('--disable-gpu')
+            options.add_experimental_option('excludeSwitches', ['enable-automation',"enable-logging"])
         elif OS == 'Ubuntu':
             os.environ['DISPLAY'] = ':10.0'
             options.add_argument('--disable-dev-shm-usage')
             options.add_argument("--remote-debugging-port=9230")
+            options.add_argument("--no-sandbox")
         options.add_argument("--headless")
         options.add_argument("window-size=1920,1080")
         options.add_argument('log-level=3')
-        options.add_experimental_option('excludeSwitches', ['enable-automation',"enable-logging"])
         webd = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         wd = Parser(webd)
         wd.openPage('https://alerts.in.ua/')
