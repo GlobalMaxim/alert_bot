@@ -35,6 +35,7 @@ class Redis_Preparation():
             logging.exception('\n'+'Get and update regions from redis error! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
     """ 
     def get_and_update_regions_from_redis(self, data):
+        try:
             with redis.Redis() as redis_client:
                 reg_from_redis = redis_client.get('reg')
                 regs = []
@@ -57,6 +58,9 @@ class Redis_Preparation():
                     result['regions'] = not_updated
                     result['is_updated'] = False
                 return result
+        except Exception as ex:
+            logging.exception('\n'+'Get and update regions from redis error! ' + '\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
+
 
     def get_regions_from_redis(self):
         try:
@@ -70,7 +74,7 @@ class Redis_Preparation():
                 active_regions['regions'] = regs
                 return active_regions
         except Exception as ex:
-            logging.exception('\n'+'Get regions from redis error! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
+            logging.exception('\n'+'Get regions from redis error! ' + '\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
 
     def create_new_user_to_redis(self,message):
         try:
@@ -102,7 +106,7 @@ class Redis_Preparation():
                         redis_client.set('users', json.dumps(users_from_redis))
 
         except:
-            logging.exception('\n'+'Create new user error! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
+            logging.exception('\n'+'Create new user error! ' + '\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
     
     def create_user_updates_to_redis(self, message):
         try:
@@ -128,7 +132,7 @@ class Redis_Preparation():
                         updates_from_redis[user_id] = user_data
                         redis_client.set('updates', json.dumps(updates_from_redis))
         except:
-            logging.exception('\n'+'Create user updates error! ' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
+            logging.exception('\n'+'Create user updates error! ' + '\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
         
     def get_new_users_from_redis(self):
         with redis.Redis(db=1) as redis_client:

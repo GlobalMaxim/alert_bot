@@ -19,6 +19,7 @@ async def update_api_data():
     r = Redis_Preparation()
     res = r.get_and_update_regions_from_redis(api_data)
     if res['is_updated'] == True:
+        print('waiting 10 sec')
         await asyncio.sleep(10)
         await parse_photo()
         print('waiting for 20 sec sleep')

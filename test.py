@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -12,6 +13,8 @@ import os
 from parser import Parser
 from imagePreparator import ImagePreparator
 import json
+
+logging.basicConfig(level=logging.WARNING, filename='log/redis-log.txt')
 
 async def parse_photo():
     try:
@@ -44,6 +47,7 @@ async def parse_photo():
     except Exception as ex:
         with open('log/parser-log.txt', 'a') as file:
             file.write(str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n' + str(ex) + '\n')
+        logging.exception('\n'+'Parse photo log! ' + '\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
 
 
 def api_parse_info():
