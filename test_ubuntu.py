@@ -10,7 +10,7 @@ from imagePreparator import ImagePreparator
 import json
 import os
 
-def  parse_photo():
+async def parse_photo():
     try:
         os.environ['DISPLAY'] = ':10.0'
         options = Options()

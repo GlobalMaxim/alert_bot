@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import *
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.keys import Keys
-import time
 
 
 
@@ -35,11 +34,9 @@ class Parser():
     def getRegions(self):
         dict = {}
         self.wait('//div[@class="amo-map-alarms-list"]/div')
-        # time.sleep(5)
         elements = self.driver.find_elements_by_xpath('//div[@class="amo-map-alarms-list"]/div')
         
         for elem in elements:
-            # print(elem)
             region = elem.find_element(By.XPATH, './div[2]/div[1]').text
             time_al = elem.find_element(By.XPATH, './div[2]/div[2]/div[2]/span').text
             if 'область' in region:

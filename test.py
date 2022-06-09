@@ -7,57 +7,45 @@ import redis
 import time
 from datetime import datetime
 from selenium.webdriver.chrome.options import Options
-from config import API_KEY
+from config import API_KEY, OS
+import os
 from parser import Parser
 from imagePreparator import ImagePreparator
 import json
 
-def  parse_photo():
+async def parse_photo():
     try:
         options = Options()
+        if OS == 'Windows':
+            options.add_argument('--disable-gpu')
+        elif OS == 'Ubuntu':
+            os.environ['DISPLAY'] = ':10.0'
+            options.add_argument('--disable-dev-shm-usage')
+            options.add_argument("--remote-debugging-port=9230")
         options.add_argument("--headless")
-        options.add_argument('--disable-gpu')
         options.add_argument("window-size=1920,1080")
-        options.add_argument('--log-level=3')
-        # options.add_experimental_option('excludeSwitches', ['enable-automation'])
+        options.add_argument('log-level=3')
+        options.add_experimental_option('excludeSwitches', ['enable-automation',"enable-logging"])
         webd = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
         wd = Parser(webd)
         wd.openPage('https://alerts.in.ua/')
         wd.setLocalStorage('darkMode', 'true')
         wd.setLocalStorage('liteMap', 'false')
         wd.wait('//div[@id="map"]/*[name()="svg"]/*[name()="g"]//*[@id="a"]')
-        time.sleep(1)
+        await asyncio.sleep(1)
         wd.getImage('screenshot.png')
         image = ImagePreparator()
         image.cutImage('screenshot.png')
+        print('finished')
+        webd.stop_client()
+        webd.close()
+        webd.quit()
     except Exception as ex:
         with open('log/parser-log.txt', 'a') as file:
-            file.write(str(ex))
+            file.write(str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n' + str(ex) + '\n')
 
-def parse_info():
-    try:
-        start_time = datetime.now()
-        options = Options()
-        options.add_argument("--headless")
-        options.add_argument('--disable-gpu')
-        options.add_argument("window-size=1920,1080")
-        options.add_argument("--disable-notifications")
-        # options.add_experimental_option('excludeSwitches', ['enable-automation'])
-        webd = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-        wd1 = Parser(webd)
-        wd1.openPage('https://alarmmap.online/')
-        regions = wd1.getRegions() 
-        print(datetime.now() - start_time)
-        # print(regions)
-        
-        return regions
-    except Exception as ex:
-        with open('log/parser-log.txt', 'a') as file:
-            file.write(str(ex))
 
 def api_parse_info():
-    
-    regions = {}
     headers = {
          "X-API-Key": API_KEY
     }
@@ -65,17 +53,17 @@ def api_parse_info():
     req = requests.get(url, headers=headers)
     res = json.loads(req.text)
     for i in res["states"]:
-        if i['alert'] == True:
-            name = i['name']
             clear_date = datetime.fromisoformat(i['changed']).strftime("%H:%M %d-%m-%Y")
-            regions[name] = clear_date
-    
-    return regions
+            i['changed'] = clear_date
+            i.pop('id')
+    # print(res['states'])
+    return res['states']
 
 def main():
-    # parse_info()
-    parse_photo()
+    # parse_photo()
     # api_parse_info()
+    # get_updated_regions()
+    pass
 
 
 if __name__ == '__main__':

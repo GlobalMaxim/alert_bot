@@ -1,17 +1,17 @@
 import asyncio
+from aiogram.types import ParseMode
+from typing import Union
 from telebot import dp, bot
-from aiogram.types import Message, BotCommand, BotCommandScopeChat, BotCommandScopeDefault
+from aiogram.types import Message, BotCommand, BotCommandScopeChat, BotCommandScopeDefault,CallbackQuery
 from config import admin_id, OS
 from keyboards.default.menu import menu
 from aiogram.dispatcher.filters import Command, Text
 from db.database import Database
 from telegram_redis.redisPreparation import Redis_Preparation 
 from crone.crone import scheduler
-
-if OS == 'Windows':
-    from test_windows import  parse_photo, api_parse_info
-elif OS == 'Ubuntu':
-    from test_ubuntu import  parse_photo, api_parse_info
+from keyboards.mailing.regionsMarkup import regions_markup
+from mailing.mailing import Mailing
+from test import  parse_photo, api_parse_info
 
 
 async def send_to_admin(dp):
@@ -20,17 +20,13 @@ async def send_to_admin(dp):
     middlewares.setup(dp)
     await bot.send_message(admin_id, 'Бот запущен', reply_markup=menu)
     await bot.set_my_commands([
-        BotCommand(command='/restart', description='Перезапустить')
+        BotCommand(command='/restart', description='Перезапустити')
     ], scope=BotCommandScopeDefault())
     await bot.set_my_commands([
+        BotCommand('set', 'Выбрать регион'),
         BotCommand('show_all_data', 'Показать статистику'),
         BotCommand('parse', 'Обновить фото'),
         BotCommand('save', 'Сохранить данные')
-        # BotCommand('delete', 'Очистить кеш')
-        # BotCommand('show_users_count', 'Колличество пользователей'),
-        # BotCommand('show_all_requests_count', 'Всего запросов')
-        
-        # BotCommand('append', 'ОБновить пользователей')
     ], scope=BotCommandScopeChat(chat_id=admin_id))
 
 @dp.message_handler(commands=['show_users_count'])
@@ -49,10 +45,7 @@ async def save(message: Message):
 
 @dp.message_handler(commands=['parse'])
 async def save(message: Message):
-    parse_photo()
-    # db = Database()
-    # values = db.save_data_to_db()
-    # db.close_connection()
+    await parse_photo()
     await message.answer('Фото обновлено')
 
 @dp.message_handler(commands=['delete'])
