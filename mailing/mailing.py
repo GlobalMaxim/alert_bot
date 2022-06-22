@@ -39,12 +39,12 @@ class Mailing():
 
     async def send_mailing(self, bot):
         regions = api_parse_info()
-        try:
-            with redis.Redis() as redis_client:
-                users_from_redis = json.loads(redis_client.get('mail'))
-                if users_from_redis != None:
-                    for i in regions:
-                        for key, values in users_from_redis.items():
+        with redis.Redis() as redis_client:
+            users_from_redis = json.loads(redis_client.get('mail'))
+            if users_from_redis != None:
+                for i in regions:
+                    for key, values in list(users_from_redis.items()):
+                        try:
                             if i['name'] == values['user_region'] and values['is_sent_start_message'] == False and i['alert'] == True:
                                 # print(f'Need to send message to user {key}')
                                 await bot.send_message(int(key),f'🔴<b>Повітряна тривога у "{i["name"]}"</b>\nПочаток тривоги у {i["changed"]}', parse_mode=ParseMode.HTML)
@@ -54,10 +54,28 @@ class Mailing():
                                 values['is_sent_stop_message'] = True
                                 values['is_sent_start_message'] = False
                                 await bot.send_message(int(key), f'🟢<b>Відбій повітряної тривоги у "{i["name"]}"</b>\nОновлено у {i["changed"]}', parse_mode=ParseMode.HTML)
-                    redis_client.set('mail', json.dumps(users_from_redis))
-        except Exception as ex:
-            logging.exception('\n'+'Send mailing log! ' + '\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
+                        except:
+                            del users_from_redis[str(key)]
+                            # users_from_redis.pop(str(key), None)
+                            logging.exception('\n\n'+'Send mailing log! '  + '\n'+ f'User ID: {key}' + '\n\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
+                redis_client.set('mail', json.dumps(users_from_redis))
+            with open('mailing/mails.json', 'w') as f:
+                json.dump(users_from_redis, f, ensure_ascii=False)
     
+    def get_number_mails(self):
+        with redis.Redis() as redis_client:
+            users_from_redis = json.loads(redis_client.get('mail'))
+            return len(users_from_redis)
+
+    def clear_redis_statuses(self):
+        with redis.Redis() as redis_client:
+            users_from_redis = json.loads(redis_client.get('mail'))
+            if users_from_redis != None:
+                for key, values in users_from_redis.items():
+                    values['is_sent_stop_message'] = False
+                    values['is_sent_start_message'] = False
+            redis_client.set('mail', json.dumps(users_from_redis))
+        
     def stop_mailing(self, callback):
         try:
             user_id = str(callback.from_user.id)

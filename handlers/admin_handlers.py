@@ -26,7 +26,9 @@ async def send_to_admin(dp):
         BotCommand('set', 'Выбрать регион'),
         BotCommand('show_all_data', 'Показать статистику'),
         BotCommand('parse', 'Обновить фото'),
-        BotCommand('save', 'Сохранить данные')
+        BotCommand('show_mails_count', 'Количество рассылок'),
+        BotCommand('clear_mails_log', 'Очистить редис')
+        # BotCommand('save', 'Сохранить данные')
     ], scope=BotCommandScopeChat(chat_id=admin_id))
 
 @dp.message_handler(commands=['show_users_count'])
@@ -35,6 +37,18 @@ async def count_user(message: Message):
     count = db.count_users()
     db.close_connection()
     await message.answer(text=f'Всего {count} пользователей')
+
+@dp.message_handler(commands=['show_mails_count'])
+async def count_mails(message: Message):
+    mail = Mailing()
+    mails_count = mail.get_number_mails()
+    await message.answer(text=f'Всего {mails_count} рассылок')
+
+@dp.message_handler(commands=['clear_mails_log'])
+async def count_mails(message: Message):
+    mail = Mailing()
+    mail.clear_redis_statuses()
+    await message.answer(text=f'Редис очищен')
 
 @dp.message_handler(commands=['save'])
 async def save(message: Message):
