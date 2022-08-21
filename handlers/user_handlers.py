@@ -1,3 +1,4 @@
+from datetime import datetime
 from aiogram.types import ParseMode
 from mailing.mailing import Mailing
 from telebot import dp, bot
@@ -54,12 +55,13 @@ async def run(message: Message):
     await message.answer('Зачекайте...')
     r = Redis_Preparation()
     res = r.get_regions_from_redis()
+    current_date = str(datetime.now().strftime('%H:%M %d-%m-%Y'))
     if len(res['regions']) > 0:
         await message.answer('Тривоги працюють в наступних областях:')
         for i in res['regions']:
-            await message.answer(f"<b>{i['name']}</b>\nПочаток тривоги у {i['changed']}", parse_mode=ParseMode.HTML)
+            await message.answer(f"🛑 <b>{i['name']}</b>\nПочаток тривоги у {i['changed']}\n@ukraine_alarm_bot", parse_mode=ParseMode.HTML)
         await message.answer('Зачекайте, завантажується фото...')
-        await message.answer_photo(photo=open('screenshot.png', 'rb'), reply_markup=markup)
+        await message.answer_photo(photo=open('screenshot.png', 'rb'), caption=f"<b>❗️Карта повітряних тривог станом на {current_date}</b>\n@ukraine_alarm_bot", reply_markup=markup)
     else:
         await message.answer('Тривог зараз немає!')
     r.create_user_updates_to_redis(message)

@@ -34,7 +34,7 @@ async def parse_photo():
         wd = Parser(webd)
         wd.openPage('https://alerts.in.ua/')
         wd.setLocalStorage('darkMode', 'true')
-        wd.setLocalStorage('liteMap', 'false')
+        webd.refresh()
         await asyncio.sleep(2)
         # await wd.wait('//div[@id="map"]/*[name()="svg"]/*[name()="g"]//*[@id="a"]')
         # await asyncio.sleep(1)
