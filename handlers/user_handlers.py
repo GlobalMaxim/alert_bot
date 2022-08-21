@@ -52,7 +52,7 @@ async def run(message: Message):
     if str(message.from_user.id) != admin_id:
         notify_admin=f"Пользователь с ником @{message.from_user.username}, {message.from_user.first_name} воспользовался ботом"
         await bot.send_message(admin_id, text=notify_admin, disable_notification=True)
-    await message.answer('Зачекайте...')
+    
     r = Redis_Preparation()
     res = r.get_regions_from_redis()
     current_date = str(datetime.now().strftime('%H:%M %d-%m-%Y'))
@@ -60,7 +60,7 @@ async def run(message: Message):
         await message.answer('Тривоги працюють в наступних областях:')
         for i in res['regions']:
             await message.answer(f"🛑 <b>{i['name']}</b>\nПочаток тривоги у {i['changed']}\n@ukraine_alarm_bot", parse_mode=ParseMode.HTML)
-        await message.answer('Зачекайте, завантажується фото...')
+        
         await message.answer_photo(photo=open('screenshot.png', 'rb'), caption=f"<b>❗️Карта повітряних тривог станом на {current_date}</b>\n@ukraine_alarm_bot", reply_markup=markup)
     else:
         await message.answer('Тривог зараз немає!')
