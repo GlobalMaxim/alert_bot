@@ -49,7 +49,7 @@ async def run(message: Message):
         markup = menu_2
     else:
         markup = menu
-    if str(message.from_user.id) != admin_id:
+    if message.from_user.id != admin_id:
         notify_admin=f"Пользователь с ником @{message.from_user.username}, {message.from_user.first_name} воспользовался ботом"
         await bot.send_message(admin_id, text=notify_admin, disable_notification=True)
     

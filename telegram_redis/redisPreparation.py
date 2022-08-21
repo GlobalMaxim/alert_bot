@@ -97,12 +97,12 @@ class Redis_Preparation():
 
                 if redis_client.get('users') is None:
                     data = {}
-                    data[user_id] = user_data
+                    data[str(user_id)] = user_data
                     redis_client.set('users', json.dumps(data))
                 else:
                     users_from_redis = json.loads(redis_client.get('users'))
                     if str(user_id) not in users_from_redis.keys():
-                        users_from_redis[user_id] = user_data
+                        users_from_redis[str(user_id)] = user_data
                         redis_client.set('users', json.dumps(users_from_redis))
 
         except:
@@ -119,7 +119,7 @@ class Redis_Preparation():
                 }
                 if redis_client.get('updates') is None:
                     data = {}
-                    data[user_id] = user_data
+                    data[str(user_id)] = user_data
                     redis_client.set('updates', json.dumps(data))
                 else:
                     updates_from_redis = json.loads(redis_client.get('updates'))
@@ -129,7 +129,7 @@ class Redis_Preparation():
                         updates_from_redis[str(user_id)]['modified_at'] = str(datetime.now().strftime("%d-%m-%Y %H:%M"))
                         redis_client.set('updates', json.dumps(updates_from_redis))
                     else:
-                        updates_from_redis[user_id] = user_data
+                        updates_from_redis[str(user_id)] = user_data
                         redis_client.set('updates', json.dumps(updates_from_redis))
         except:
             logging.exception('\n'+'Create user updates error! ' + '\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
