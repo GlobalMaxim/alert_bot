@@ -3,6 +3,8 @@ import redis
 import json
 import logging
 
+from test import api_parse_info
+
 class Redis_Preparation():
 
     logging.basicConfig(level=logging.WARNING, filename='log/redis-log.txt')
@@ -60,6 +62,36 @@ class Redis_Preparation():
                 return result
         except Exception as ex:
             logging.exception('\n'+'Get and update regions from redis error! ' + '\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
+
+    def get_updated_regions(self):
+        try:
+            with redis.Redis() as redis_client:
+                try:
+                    regions_from_redis = json.loads(redis_client.get('updated_regs'))
+                except:
+                    regions_from_redis = None
+                if regions_from_redis == None:
+                    default = self.get_regions_from_redis()
+                    redis_client.set('updated_regs', json.dumps(default['regions']))
+                    return default['regions']
+                else:
+                    api_data = api_parse_info()
+                    regions_from_api = self.get_and_update_regions_from_redis(api_data)
+                    regs_redis = regions_from_redis
+                    changed_regs = []
+                    if len(regions_from_redis) > 0:
+                        for region_api in regions_from_api['regions']:
+                            for key, reg_redis in enumerate(regs_redis.copy()):
+                                if region_api['alert'] == True and region_api not in regs_redis:
+                                    changed_regs.append(region_api)
+                                    regs_redis.append(region_api)
+                                elif region_api['alert'] == False and region_api['name'] == reg_redis['name']:              
+                                    del regs_redis[key]
+                                    changed_regs.append(region_api)
+                    redis_client.set('updated_regs', json.dumps(regs_redis))
+                    return changed_regs
+        except:
+            logging.exception('\n'+'Get updated regions error! ' + '\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
 
 
     def get_regions_from_redis(self):

@@ -84,7 +84,7 @@ async def save_user_region(call: CallbackQuery):
         await call.message.edit_reply_markup()
         await mail.save_user_mailing(call)
         await bot.send_message(chat_id=call.from_user.id, text= f'✅Вітаю, ви будете отримумати сповіщення при повітряній тривозі у <b>"{call.data}"</b>', parse_mode=ParseMode.HTML, reply_markup=menu_2)
-        await mail.send_mailing(bot)
+        await mail.check_is_active_user_region(bot,call)
     await call.answer()
 
 @dp.message_handler(Text(equals=["❌Вимкнути сповіщення про тривогу"]))

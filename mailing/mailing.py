@@ -2,6 +2,7 @@ from datetime import datetime
 import logging
 import redis
 import json
+from telegram_redis.redisPreparation import Redis_Preparation
 from test import  api_parse_info
 from aiogram.types import ParseMode
 """
@@ -37,8 +38,17 @@ class Mailing():
         except Exception as ex:
             logging.exception('\n'+'Save user mailing log! ' + '\n' + str(datetime.now().strftime("%d-%m-%Y %H:%M"))+ '\n')
 
+    async def check_is_active_user_region(self, bot, callback):
+        user_region = callback.data
+        user_id = callback.from_user.id
+        regions = Redis_Preparation().get_regions_from_redis()
+        for region in regions['regions']:
+            if region['name'] == user_region:
+                await bot.send_message(user_id,f'🔴<b>Повітряна тривога у "{region["name"]}"</b>\nПочаток тривоги у {region["changed"]}\n\n@Official_alarm_bot', parse_mode=ParseMode.HTML)
+                break
+
     async def send_mailing(self, bot):
-        regions = api_parse_info()
+        regions = Redis_Preparation().get_updated_regions()
         with redis.Redis() as redis_client:
             users_from_redis = json.loads(redis_client.get('mail'))
             if users_from_redis != None:
@@ -61,6 +71,7 @@ class Mailing():
                 redis_client.set('mail', json.dumps(users_from_redis))
             with open('mailing/mails.json', 'w') as f:
                 json.dump(users_from_redis, f, ensure_ascii=False)
+
     
     def get_number_mails(self):
         with redis.Redis() as redis_client:
