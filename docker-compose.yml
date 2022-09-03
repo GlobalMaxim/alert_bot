@@ -1,0 +1,15 @@
+version: '3.6'
+services:
+  db:
+    container_name: 'my-sql'
+    image: 'mysql:latest'
+    restart: always
+    ports: 
+      - 43306:3306
+    environment:
+        MYSQL_ROOT_PASSWORD: root
+        MYSQL_DATABASE: alert_bot_new
+        MYSQL_PASSWORD: qwerty1998
+        MYSQL_USER: maxim
+    volumes:
+      - './docker/db:/var/lib/mysql'
