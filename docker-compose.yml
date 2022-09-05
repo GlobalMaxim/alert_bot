@@ -13,3 +13,16 @@ services:
         MYSQL_USER: maxim
     volumes:
       - './docker/db:/var/lib/mysql'
+  redis:
+    container_name: 'redis'
+    image: 'redis:latest'
+    command: redis-server --loglevel warning
+    restart: always
+    ports: 
+      - 6379:6379
+    environment: 
+      - ALLOW_EMPTY_PASSWORD=Yes
+    volumes:
+      - './docker/redis:/usr/local/etc/redis/redis.conf'
+      - './docker/redis:/data'
+    mem_limit: 65536m
